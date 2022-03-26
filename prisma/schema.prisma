@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Room {
+  id        Int    @id @default(autoincrement())
+  title     String
+  photo_url String @db.VarChar(512)
+
+  questions Question[]
+  gamerooms Gameroom[]
+
+  @@map("rooms")
+}
+
+model Gameroom {
+  id           Int           @id @default(autoincrement())
+  participants Participant[]
+
+  room    Room @relation(fields: [room_id], references: [id])
+  room_id Int
+
+  @@map("gamerooms")
+}
+
+model Participant {
+  id          Int      @id @default(autoincrement())
+  username    String   @db.VarChar(256)
+  gameroom    Gameroom @relation(fields: [gameroom_id], references: [id])
+  gameroom_id Int
+
+  @@map("participants")
+}
+
+model Question {
+  id             Int           @id @default(autoincrement())
+  content        String        @db.VarChar(256)
+  correct_answer String
+  alternatives   Alternative[]
+
+  room    Room @relation(fields: [room_id], references: [id])
+  room_id Int
+
+  @@map("questions")
+}
+
+model Alternative {
+  id          Int      @id @default(autoincrement())
+  content     String
+  question    Question @relation(fields: [question_id], references: [id])
+  question_id Int
+
+  @@map("alternatives")
+}
