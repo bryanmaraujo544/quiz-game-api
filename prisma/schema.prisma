@@ -23,6 +23,8 @@ model Room {
 
 model Gameroom {
   id           Int           @id @default(autoincrement())
+  is_open      Boolean       @default(true)
+  created_at   DateTime      @default(now())
   participants Participant[]
 
   room    Room @relation(fields: [room_id], references: [id])

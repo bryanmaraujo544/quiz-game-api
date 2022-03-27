@@ -1,8 +1,15 @@
+const res = require('express/lib/response');
 const QuestionsRepository = require('../repositories/QuestionsRepository');
 
 class QuestionController {
   async index(req, res) {
     const questions = await QuestionsRepository.findAll();
+    res.send(questions);
+  }
+
+  async showByRoomId(req, res) {
+    const { roomId } = req.params;
+    const questions = await QuestionsRepository.findByRoomId(roomId);
     res.send(questions);
   }
 
