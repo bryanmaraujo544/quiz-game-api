@@ -1,5 +1,4 @@
 const prisma = require('../../prisma');
-
 class ParticipantsRepository {
   async findAll() {
     const participants = await prisma.participant.findMany();
@@ -25,6 +24,20 @@ class ParticipantsRepository {
     });
 
     return participant;
+  }
+
+  async findByUsernameAndGameroom({ username, gameroomId }) {
+    const gameroom = await prisma.participant.findFirst({
+      where: {
+        username,
+        AND: [
+          {
+            gameroom_id: Number(gameroomId),
+          },
+        ],
+      },
+    });
+    return gameroom;
   }
 }
 

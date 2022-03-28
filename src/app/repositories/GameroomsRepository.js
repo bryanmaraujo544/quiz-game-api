@@ -7,10 +7,9 @@ class GameroomsRepository {
   }
 
   async create({ roomId }) {
-    console.log({ roomId });
     const gameroomCreated = await prisma.gameroom.create({
       data: {
-        room_id: roomId,
+        room_id: Number(roomId),
       },
     });
 
@@ -20,12 +19,20 @@ class GameroomsRepository {
   async findByRoomId({ roomId }) {
     const gameroom = await prisma.gameroom.findFirst({
       where: {
-        room_id: roomId,
+        room_id: Number(roomId),
         AND: [
           {
             is_open: true,
           },
         ],
+      },
+      include: {
+        participants: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
       },
     });
 

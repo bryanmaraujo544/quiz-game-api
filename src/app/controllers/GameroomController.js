@@ -28,6 +28,12 @@ class GameroomController {
     const gameroomCreated = await GameroomsRepository.create({ roomId });
     res.json({ message: 'Gameroom created', gameroomCreated });
   }
+
+  async show(req, res) {
+    const { roomId } = req.params;
+    const gameroom = await GameroomsRepository.findByRoomId({ roomId });
+    res.send(gameroom);
+  }
 }
 
 module.exports = new GameroomController();

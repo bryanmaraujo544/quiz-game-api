@@ -16,6 +16,7 @@ router.post('/rooms', RoomController.store);
 
 router.get('/gamerooms', GameroomController.index);
 router.post('/gamerooms', GameroomController.store);
+router.get('/gamerooms/:roomId', GameroomController.show);
 
 router.get('/questions', QuestionController.index);
 router.get('/questions/:roomId', QuestionController.showByRoomId);

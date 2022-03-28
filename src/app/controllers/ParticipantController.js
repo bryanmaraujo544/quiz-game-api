@@ -15,6 +15,20 @@ class ParticipantController {
         .json({ message: 'Some fields are missing', participantCreated: null });
     }
 
+    const hasUsernameInGameroom =
+      await ParticipantsRepository.findByUsernameAndGameroom({
+        username,
+        gameroomId,
+      });
+    if (hasUsernameInGameroom) {
+      return res
+        .status(400)
+        .json({
+          message: 'This user already is in gameroom',
+          participantCreated: null,
+        });
+    }
+
     const participantCreated = await ParticipantsRepository.create({
       username,
       gameroomId,
