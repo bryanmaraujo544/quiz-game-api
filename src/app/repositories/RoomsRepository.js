@@ -1,4 +1,6 @@
 const prisma = require('../../prisma');
+const { server, io } = require('../../index');
+console.log('io', server);
 
 class RoomsRepository {
   async findAll() {

@@ -1,4 +1,6 @@
 const RoomsRepository = require('../repositories/RoomsRepository');
+const { server, io } = require('../../index.js');
+console.log('SERVER', server);
 
 class RoomController {
   async index(req, res) {
