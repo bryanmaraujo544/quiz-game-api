@@ -4,7 +4,10 @@ console.log('SERVER', server);
 
 class RoomController {
   async index(req, res) {
-    const rooms = await RoomsRepository.findAll();
+    const rooms = await RoomsRepository.findAll({
+      payload: null,
+      socket: null,
+    });
     res.send(rooms);
   }
 

@@ -27,9 +27,34 @@ class GameroomsRepository {
           },
         ],
       },
+      include: {
+        participants: true,
+      },
     });
 
     return gameroom;
+  }
+
+  async stJoinRoom({ payload, socket }) {
+    const gameroom = await prisma.gameroom.findFirst({
+      where: {
+        room_id: Number(payload.roomId),
+        AND: [
+          {
+            is_open: true,
+          },
+        ],
+      },
+      include: {
+        participants: true,
+      },
+    });
+    console.log('GAMEROOM', gameroom);
+    socket.emit('person_entered_in_room', {
+      username: payload.username,
+      participantsAmount: gameroom.participants.length,
+    });
+    // console.log('STJOINROOM', { payload, socket });
   }
 }
 

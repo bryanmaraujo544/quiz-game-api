@@ -17,6 +17,20 @@ class ParticipantsRepository {
     return participant;
   }
 
+  async findByUsernameAndGameroom({ username, gameroomId }) {
+    const participant = await prisma.participant.findFirst({
+      where: {
+        username,
+        AND: [
+          {
+            gameroom_id: gameroomId,
+          },
+        ],
+      },
+    });
+    return participant;
+  }
+
   async findByUsername(username) {
     const participant = await prisma.participant.findFirst({
       where: {
