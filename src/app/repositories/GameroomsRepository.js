@@ -7,7 +7,6 @@ class GameroomsRepository {
   }
 
   async create({ roomId }) {
-    console.log({ roomId });
     const gameroomCreated = await prisma.gameroom.create({
       data: {
         room_id: roomId,
@@ -49,8 +48,9 @@ class GameroomsRepository {
         participants: true,
       },
     });
-    console.log('GAMEROOM', gameroom);
-    socket.emit('person_entered_in_room', {
+    console.log({ gameroom });
+
+    socket.broadcast.emit('person_entered_in_room', {
       username: payload.username,
       participantsAmount: gameroom.participants.length,
     });

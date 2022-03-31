@@ -1,6 +1,5 @@
 const prisma = require('../../prisma');
 const { server, io } = require('../../index');
-console.log('io', server);
 
 class RoomsRepository {
   // constructor({ payload }) {
@@ -8,7 +7,6 @@ class RoomsRepository {
   // }
 
   async findAll({ payload, socket }) {
-    console.log('SOCKET IN FIND ALL', socket);
     const rooms = await prisma.room.findMany();
     return rooms;
   }

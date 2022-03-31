@@ -14,6 +14,7 @@ app.use(routes);
 
 const RoomsRepository = require('./app/repositories/RoomsRepository');
 const GameroomsRepository = require('./app/repositories/GameroomsRepository');
+const ParticipantsRepository = require('./app/repositories/ParticipantsRepository');
 
 function createApplication(httpServer, components, serverOptions = {}) {
   const io = new Server(httpServer, serverOptions);
@@ -22,16 +23,23 @@ function createApplication(httpServer, components, serverOptions = {}) {
   //   createTodoHandlers(components);
 
   io.on('connection', (socket) => {
-    console.log('CONNECTION');
+    console.log('Connected', socket.id);
     socket.on('join_room', (payload) => {
       socket.join(payload.roomId);
 
       return GameroomsRepository.stJoinRoom({ payload, socket });
     });
+
     socket.on('rooms_opened', (payload) => {
       console.log(payload);
       return RoomsRepository.findAll({ payload, socket });
     });
+
+    socket.on('participant_left_room', (payload) => {
+      console.log({ payload });
+      return ParticipantsRepository.stRemoveParticipant({ payload, socket });
+    });
+
     // socket.on('todo:read', readTodo);
     // socket.on('todo:update', updateTodo);
     // socket.on('todo:delete', deleteTodo);

@@ -8,6 +8,7 @@ createApplication(
     cors: {
       origin: '*',
     },
+    methods: ['GET', 'POST'],
   }
 );
 

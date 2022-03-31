@@ -40,6 +40,37 @@ class ParticipantsRepository {
 
     return participant;
   }
+
+  async stRemoveParticipant({ socket, payload }) {
+    const participantDeleted = await prisma.participant.deleteMany({
+      where: {
+        username: payload.username,
+        AND: [
+          {
+            gameroom_id: payload.gameroomId,
+          },
+        ],
+      },
+    });
+    const gameroom = await prisma.gameroom.findFirst({
+      where: {
+        id: Number(payload.gameroomId),
+        AND: [
+          {
+            is_open: true,
+          },
+        ],
+      },
+      include: { participants: true },
+    });
+    console.log({ gameroom });
+
+    socket.broadcast.emit('participant_left_this_room', {
+      username: payload.username,
+      gameroomId: payload.gameroomId,
+      participantsAmount: gameroom.participants.length,
+    });
+  }
 }
 
 module.exports = new ParticipantsRepository();

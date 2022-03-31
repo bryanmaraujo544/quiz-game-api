@@ -9,6 +9,7 @@ class GameroomController {
   async showByRoomId(req, res) {
     const { roomId } = req.params;
     const gameroom = await GameroomsRepository.findByRoomId(roomId);
+    console.log('gameroom', gameroom);
     res.send(gameroom);
   }
 

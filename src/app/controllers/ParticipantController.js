@@ -7,8 +7,8 @@ class ParticipantController {
   }
 
   async store(req, res) {
-    console.log('oi');
     const { username, gameroomId } = req.body;
+    console.log({ username, gameroomId });
 
     if (!username || !gameroomId) {
       return res
@@ -16,15 +16,16 @@ class ParticipantController {
         .json({ message: 'Some fields are missing', participantCreated: null });
     }
 
-    const hasThisUsernameInGameroom =
+    const userInGameroom =
       await ParticipantsRepository.findByUsernameAndGameroom({
         username,
         gameroomId,
       });
-    if (hasThisUsernameInGameroom) {
-      return res.status(400).json({
+
+    if (userInGameroom) {
+      return res.json({
         message: 'This participant already was created',
-        participantCreated: null,
+        participantCreated: userInGameroom.username,
       });
     }
 
