@@ -8,7 +8,6 @@ class ParticipantController {
 
   async store(req, res) {
     const { username, gameroomId } = req.body;
-    console.log({ username, gameroomId });
 
     if (!username || !gameroomId) {
       return res
@@ -26,6 +25,18 @@ class ParticipantController {
       return res.json({
         message: 'This participant already was created',
         participantCreated: userInGameroom.username,
+      });
+    }
+
+    const gameroom = await ParticipantsRepository.findGameroomOfParticipant({
+      username,
+      gameroomId,
+    });
+
+    if (gameroom.participants.length === 10) {
+      return res.json({
+        message: 'The gameroom is full',
+        participantCreated: null,
       });
     }
 

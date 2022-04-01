@@ -41,6 +41,19 @@ class ParticipantsRepository {
     return participant;
   }
 
+  async findGameroomOfParticipant({ gameroomId }) {
+    const gameroom = await prisma.gameroom.findFirst({
+      where: {
+        id: Number(gameroomId),
+      },
+      include: {
+        participants: true,
+      },
+    });
+
+    return gameroom;
+  }
+
   async stRemoveParticipant({ socket, payload }) {
     const participantDeleted = await prisma.participant.deleteMany({
       where: {
@@ -61,13 +74,13 @@ class ParticipantsRepository {
           },
         ],
       },
-      include: { participants: true },
+      include: { participants: true, room: true },
     });
-    console.log({ gameroom });
 
     socket.broadcast.emit('participant_left_this_room', {
       username: payload.username,
       gameroomId: payload.gameroomId,
+      gameroom: gameroom,
       participantsAmount: gameroom.participants.length,
     });
   }

@@ -2,7 +2,15 @@ const prisma = require('../../prisma');
 
 class GameroomsRepository {
   async findAll() {
-    const gamerooms = await prisma.gameroom.findMany();
+    const gamerooms = await prisma.gameroom.findMany({
+      include: {
+        room: true,
+        participants: true,
+      },
+      where: {
+        is_open: true,
+      },
+    });
     return gamerooms;
   }
 
@@ -46,15 +54,23 @@ class GameroomsRepository {
       },
       include: {
         participants: true,
+        room: true,
       },
     });
-    console.log({ gameroom });
 
-    socket.broadcast.emit('person_entered_in_room', {
-      username: payload.username,
-      participantsAmount: gameroom.participants.length,
-    });
-    // console.log('STJOINROOM', { payload, socket });
+    if (gameroom.participants.length < 10) {
+      console.log('minor than 10');
+      socket.broadcast.emit('person_entered_in_room', {
+        username: payload.username,
+        gameroom: gameroom,
+        participantsAmount: gameroom.participants.length,
+      });
+
+      return;
+    }
+
+    // If there are 10 participants, start quiz
+    // socket.broadcast.emit('quiz_started', { roomId: gameroom.id });
   }
 }
 
