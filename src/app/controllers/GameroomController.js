@@ -9,6 +9,7 @@ class GameroomController {
   async showByRoomId(req, res) {
     const { roomId } = req.params;
     const gameroom = await GameroomsRepository.findByRoomId(roomId);
+    console.log('showByRoomId', gameroom);
     res.send(gameroom);
   }
 
@@ -24,6 +25,7 @@ class GameroomController {
     const hasGameroomWithRoomIdOpen = await GameroomsRepository.findByRoomId({
       roomId,
     });
+
     if (hasGameroomWithRoomIdOpen) {
       return res.status(400).json({
         message: 'One gameroom with this same room id is already opened ',
@@ -33,6 +35,15 @@ class GameroomController {
 
     const gameroomCreated = await GameroomsRepository.create({ roomId });
     res.json({ message: 'Gameroom created', gameroomCreated });
+  }
+
+  async getResults(req, res) {
+    const { gameroomId } = req.params;
+    console.log({ gameroomId });
+    const gameroomWithResult = await GameroomsRepository.getResults({
+      gameroomId,
+    });
+    res.send(gameroomWithResult);
   }
 }
 

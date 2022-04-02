@@ -11,6 +11,7 @@ class GameroomsRepository {
         is_open: true,
       },
     });
+
     return gamerooms;
   }
 
@@ -42,10 +43,10 @@ class GameroomsRepository {
     return gameroom;
   }
 
-  async stJoinRoom({ payload, socket }) {
-    const gameroom = await prisma.gameroom.findFirst({
+  async getResults({ gameroomId }) {
+    const result = await prisma.gameroom.findFirst({
       where: {
-        room_id: Number(payload.roomId),
+        id: Number(gameroomId),
         AND: [
           {
             is_open: true,
@@ -53,24 +54,70 @@ class GameroomsRepository {
         ],
       },
       include: {
-        participants: true,
-        room: true,
+        participants: {
+          orderBy: {
+            correct_answers: 'desc',
+          },
+        },
+      },
+    });
+    return result;
+  }
+
+  async stJoinRoom({ payload, socket }) {
+    const room = await prisma.room.findFirst({
+      where: {
+        id: Number(payload.roomId),
+      },
+      include: {
+        gamerooms: {
+          where: {
+            is_open: true,
+          },
+          include: {
+            participants: true,
+          },
+        },
       },
     });
 
-    if (gameroom.participants.length < 10) {
-      console.log('minor than 10');
+    const gameroom = room?.gamerooms[0];
+    if (gameroom.participants.length <= 10) {
       socket.broadcast.emit('person_entered_in_room', {
         username: payload.username,
-        gameroom: gameroom,
+        room: room,
         participantsAmount: gameroom.participants.length,
       });
-
-      return;
     }
 
     // If there are 10 participants, start quiz
-    // socket.broadcast.emit('quiz_started', { roomId: gameroom.id });
+    if (gameroom.participants.length === 10) {
+      let counter = 120;
+      const interval = setInterval((oi) => {
+        console.log(counter);
+        if (counter > 0) {
+          counter -= 1;
+          socket.broadcast.emit('quiz_started', {
+            gameroomId: gameroom.id,
+            counter,
+          }); // emitting to all of other users
+          socket.emit('quiz_started', { gameroomId: gameroom.id, counter }); // emitting to user that just entered the room
+          return;
+        } else {
+          return;
+        }
+      }, 1000);
+
+      setTimeout(() => {
+        clearInterval(interval);
+      }, 1000 * 130);
+
+      setTimeout(() => {
+        // Emit to front end that quiz ended and the front grab the results
+        socket.broadcast.emit('quiz_ended', { gameroomId: gameroom.id });
+        socket.emit('quiz_ended', { gameroomId: gameroom.id });
+      }, 1000 * 120);
+    }
   }
 }
 

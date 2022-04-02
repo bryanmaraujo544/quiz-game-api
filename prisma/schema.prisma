@@ -24,6 +24,7 @@ model Room {
 model Gameroom {
   id           Int           @id @default(autoincrement())
   is_open      Boolean       @default(true)
+  has_started  Boolean       @default(false)
   created_at   DateTime      @default(now())
   participants Participant[]
 
@@ -34,10 +35,12 @@ model Gameroom {
 }
 
 model Participant {
-  id          Int      @id @default(autoincrement())
-  username    String   @db.VarChar(256)
-  gameroom    Gameroom @relation(fields: [gameroom_id], references: [id])
-  gameroom_id Int
+  id                Int      @id @default(autoincrement())
+  username          String   @db.VarChar(256)
+  gameroom          Gameroom @relation(fields: [gameroom_id], references: [id])
+  gameroom_id       Int
+  correct_answers   Int      @default(0)
+  incorrect_answers Int      @default(0)
 
   @@map("participants")
 }

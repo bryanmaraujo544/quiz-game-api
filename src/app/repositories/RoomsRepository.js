@@ -1,13 +1,19 @@
 const prisma = require('../../prisma');
-const { server, io } = require('../../index');
 
 class RoomsRepository {
-  // constructor({ payload }) {
-  //   this.socket = socket;
-  // }
-
-  async findAll({ payload, socket }) {
-    const rooms = await prisma.room.findMany();
+  async findAll() {
+    const rooms = await prisma.room.findMany({
+      include: {
+        gamerooms: {
+          where: {
+            is_open: true,
+          },
+          include: {
+            participants: true,
+          },
+        },
+      },
+    });
     return rooms;
   }
 

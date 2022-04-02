@@ -12,6 +12,9 @@ class ParticipantsRepository {
         username,
         gameroom_id: Number(gameroomId),
       },
+      include: {
+        gameroom: true,
+      },
     });
 
     return participant;
@@ -65,7 +68,8 @@ class ParticipantsRepository {
         ],
       },
     });
-    const gameroom = await prisma.gameroom.findFirst({
+
+    const gameroomOfUser = await prisma.gameroom.findFirst({
       where: {
         id: Number(payload.gameroomId),
         AND: [
@@ -77,11 +81,30 @@ class ParticipantsRepository {
       include: { participants: true, room: true },
     });
 
+    const room = await prisma.room.findFirst({
+      where: {
+        id: Number(gameroomOfUser.room.id),
+      },
+      include: {
+        gamerooms: {
+          where: {
+            is_open: true,
+          },
+          include: {
+            participants: true,
+          },
+        },
+      },
+    });
+
+    const gameroom = room?.gamerooms[0];
+    const participants = gameroom.participants;
+
     socket.broadcast.emit('participant_left_this_room', {
       username: payload.username,
       gameroomId: payload.gameroomId,
-      gameroom: gameroom,
-      participantsAmount: gameroom.participants.length,
+      room: room,
+      participantsAmount: participants.length,
     });
   }
 }

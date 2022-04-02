@@ -1,12 +1,7 @@
 const RoomsRepository = require('../repositories/RoomsRepository');
-const { server, io } = require('../../index.js');
-
 class RoomController {
   async index(req, res) {
-    const rooms = await RoomsRepository.findAll({
-      payload: null,
-      socket: null,
-    });
+    const rooms = await RoomsRepository.findAll();
     res.send(rooms);
   }
 
