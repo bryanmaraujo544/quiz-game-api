@@ -10,6 +10,10 @@ const server = http.createServer(app);
 
 app.use(cors());
 app.use(express.json());
+app.use((error, req, res, next) => {
+  console.log('ERROR HANDLER', error);
+  res.sendStatus(500);
+});
 app.use(routes);
 
 const RoomsRepository = require('./app/repositories/RoomsRepository');

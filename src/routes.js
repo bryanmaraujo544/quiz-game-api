@@ -32,5 +32,6 @@ router.get(
   '/participants/check/:username',
   ParticipantController.checkUsername
 );
+router.put('/participants/:participantId', ParticipantController.update);
 
 module.exports = router;

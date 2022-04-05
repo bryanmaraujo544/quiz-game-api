@@ -7,9 +7,19 @@ class RoomsRepository {
         gamerooms: {
           where: {
             is_open: true,
+            AND: [
+              {
+                has_started: false,
+              },
+            ],
           },
           include: {
             participants: true,
+          },
+        },
+        questions: {
+          include: {
+            alternatives: true,
           },
         },
       },

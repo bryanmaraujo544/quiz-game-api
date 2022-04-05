@@ -48,6 +48,12 @@ class ParticipantController {
     res.json({ message: 'Participant Created', participantCreated });
   }
 
+  async update(req, res) {
+    const { participantId } = req.params;
+    const { correctAnswers, incorrectAnswers } = req.body;
+    console.log({ participantId, correctAnswers, incorrectAnswers });
+  }
+
   async checkUsername(req, res) {
     const { username } = req.params;
     if (!username) {

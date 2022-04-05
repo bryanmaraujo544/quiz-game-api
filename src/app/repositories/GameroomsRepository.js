@@ -28,10 +28,13 @@ class GameroomsRepository {
   async findByRoomId({ roomId }) {
     const gameroom = await prisma.gameroom.findFirst({
       where: {
-        room_id: roomId,
+        room_id: Number(roomId),
         AND: [
           {
             is_open: true,
+          },
+          {
+            has_started: false,
           },
         ],
       },
@@ -73,6 +76,11 @@ class GameroomsRepository {
         gamerooms: {
           where: {
             is_open: true,
+            AND: [
+              {
+                has_started: false,
+              },
+            ],
           },
           include: {
             participants: true,
@@ -82,7 +90,8 @@ class GameroomsRepository {
     });
 
     const gameroom = room?.gamerooms[0];
-    if (gameroom.participants.length <= 10) {
+    // Check if the gameroom it isn't full
+    if (gameroom?.participants?.length <= 5) {
       socket.broadcast.emit('person_entered_in_room', {
         username: payload.username,
         room: room,
@@ -91,10 +100,20 @@ class GameroomsRepository {
     }
 
     // If there are 10 participants, start quiz
-    if (gameroom.participants.length === 10) {
+    if (gameroom?.participants?.length === 5) {
+      // Set the currect gameroom as has_started
+      await prisma.gameroom.update({
+        where: {
+          id: gameroom.id,
+        },
+        data: {
+          is_open: false,
+          has_started: true,
+        },
+      });
+
       let counter = 120;
-      const interval = setInterval((oi) => {
-        console.log(counter);
+      const interval = setInterval(() => {
         if (counter > 0) {
           counter -= 1;
           socket.broadcast.emit('quiz_started', {
@@ -102,21 +121,31 @@ class GameroomsRepository {
             counter,
           }); // emitting to all of other users
           socket.emit('quiz_started', { gameroomId: gameroom.id, counter }); // emitting to user that just entered the room
-          return;
-        } else {
-          return;
         }
       }, 1000);
 
       setTimeout(() => {
-        clearInterval(interval);
-      }, 1000 * 130);
-
-      setTimeout(() => {
+        console.log('timeout');
         // Emit to front end that quiz ended and the front grab the results
         socket.broadcast.emit('quiz_ended', { gameroomId: gameroom.id });
         socket.emit('quiz_ended', { gameroomId: gameroom.id });
+
+        (async () => {
+          console.log('GAMEROOM ID', gameroom.id);
+          await prisma.gameroom.update({
+            where: {
+              id: Number(gameroom.id),
+            },
+            data: {
+              is_open: false,
+            },
+          });
+        })();
       }, 1000 * 120);
+
+      setTimeout(() => {
+        clearInterval(interval);
+      }, 1000 * 130);
     }
   }
 }
