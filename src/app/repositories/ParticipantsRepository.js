@@ -20,6 +20,19 @@ class ParticipantsRepository {
     return participant;
   }
 
+  async update({ participantId, correctAnswers, incorrectAnswers }) {
+    const participant = await prisma.participant.update({
+      where: {
+        id: Number(participantId),
+      },
+      data: {
+        correct_answers: correctAnswers,
+        incorrect_answers: incorrectAnswers,
+      },
+    });
+    return participant;
+  }
+
   async findByUsernameAndGameroom({ username, gameroomId }) {
     const participant = await prisma.participant.findFirst({
       where: {
@@ -70,49 +83,55 @@ class ParticipantsRepository {
     });
     console.log('RemoveParticipant', payload);
 
-    const gameroomOfUser = await prisma.gameroom.findFirst({
-      where: {
-        id: Number(payload.gameroomId),
-        AND: [
-          {
-            is_open: true,
-          },
-        ],
-      },
-      include: { participants: true, room: true },
-    });
-    console.log({ gameroomOfUser });
+    try {
+      const gameroomOfUser = await prisma.gameroom.findFirst({
+        where: {
+          id: payload.gameroomId,
+          AND: [
+            {
+              is_open: true,
+            },
+          ],
+        },
+        include: { participants: true, room: true },
+      });
 
-    const room = await prisma.room.findFirst({
-      where: {
-        id: Number(gameroomOfUser?.room?.id),
-      },
-      include: {
-        gamerooms: {
+      // When the room finishes, the is_open is updated to false, so when the users of this room left this above gameroomOfUser fails
+      if (gameroomOfUser) {
+        const room = await prisma.room.findFirst({
           where: {
-            is_open: true,
-            AND: [
-              {
-                has_started: false,
-              },
-            ],
+            id: Number(gameroomOfUser?.room?.id),
           },
           include: {
-            participants: true,
+            gamerooms: {
+              where: {
+                is_open: true,
+                AND: [
+                  {
+                    has_started: false,
+                  },
+                ],
+              },
+              include: {
+                participants: true,
+              },
+            },
           },
-        },
-      },
-    });
+        });
 
-    const gameroom = room?.gamerooms[0];
-    const participants = gameroom?.participants;
+        const gameroom = room?.gamerooms[0];
+        const participants = gameroom?.participants;
 
-    socket.broadcast.emit('participant_left_this_room', {
-      username: payload.username,
-      gameroomId: payload.gameroomId,
-      room: room,
-      participantsAmount: participants?.length,
-    });
+        socket.broadcast.emit('participant_left_this_room', {
+          username: payload.username,
+          gameroomId: payload.gameroomId,
+          room: room,
+          participantsAmount: participants?.length,
+        });
+      }
+    } catch (err) {
+      console.log('err in remove participant', err);
+    }
   }
 }
 

@@ -39,7 +39,7 @@ class GameroomController {
 
   async getResults(req, res) {
     const { gameroomId } = req.params;
-    // console.log({ gameroomId });
+    console.log('GameroomId in Result Controller', gameroomId);
     const gameroomWithResult = await GameroomsRepository.getResults({
       gameroomId,
     });

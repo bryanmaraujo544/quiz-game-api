@@ -33,7 +33,7 @@ class ParticipantController {
       gameroomId,
     });
 
-    if (gameroom.participants.length === 10) {
+    if (gameroom.participants.length === 5) {
       return res.json({
         message: 'The gameroom is full',
         participantCreated: null,
@@ -51,7 +51,13 @@ class ParticipantController {
   async update(req, res) {
     const { participantId } = req.params;
     const { correctAnswers, incorrectAnswers } = req.body;
-    console.log({ participantId, correctAnswers, incorrectAnswers });
+
+    const participantUpdated = await ParticipantsRepository.update({
+      participantId,
+      correctAnswers,
+      incorrectAnswers,
+    });
+    res.send(participantUpdated);
   }
 
   async checkUsername(req, res) {

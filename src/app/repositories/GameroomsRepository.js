@@ -50,11 +50,6 @@ class GameroomsRepository {
     const result = await prisma.gameroom.findFirst({
       where: {
         id: Number(gameroomId),
-        AND: [
-          {
-            is_open: true,
-          },
-        ],
       },
       include: {
         participants: {
@@ -64,13 +59,14 @@ class GameroomsRepository {
         },
       },
     });
+    console.log({ result });
     return result;
   }
 
   async stJoinRoom({ payload, socket }) {
     const room = await prisma.room.findFirst({
       where: {
-        id: Number(payload.roomId),
+        id: Number(payload.roomId) || 10,
       },
       include: {
         gamerooms: {
@@ -112,7 +108,7 @@ class GameroomsRepository {
         },
       });
 
-      let counter = 120;
+      let counter = 30;
       const interval = setInterval(() => {
         if (counter > 0) {
           counter -= 1;
@@ -131,7 +127,6 @@ class GameroomsRepository {
         socket.emit('quiz_ended', { gameroomId: gameroom.id });
 
         (async () => {
-          console.log('GAMEROOM ID', gameroom.id);
           await prisma.gameroom.update({
             where: {
               id: Number(gameroom.id),
@@ -141,11 +136,11 @@ class GameroomsRepository {
             },
           });
         })();
-      }, 1000 * 120);
+      }, 1000 * 30);
 
       setTimeout(() => {
         clearInterval(interval);
-      }, 1000 * 130);
+      }, 1000 * 40);
     }
   }
 }
