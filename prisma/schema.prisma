@@ -41,6 +41,7 @@ model Participant {
   gameroom_id       Int
   correct_answers   Int      @default(0)
   incorrect_answers Int      @default(0)
+  seconds_rest      Int?
 
   @@map("participants")
 }

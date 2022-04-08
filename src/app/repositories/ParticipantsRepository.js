@@ -20,7 +20,12 @@ class ParticipantsRepository {
     return participant;
   }
 
-  async update({ participantId, correctAnswers, incorrectAnswers }) {
+  async update({
+    participantId,
+    correctAnswers,
+    incorrectAnswers,
+    secondsRest,
+  }) {
     const participant = await prisma.participant.update({
       where: {
         id: Number(participantId),
@@ -28,6 +33,7 @@ class ParticipantsRepository {
       data: {
         correct_answers: correctAnswers,
         incorrect_answers: incorrectAnswers,
+        seconds_rest: secondsRest,
       },
     });
     return participant;

@@ -50,12 +50,13 @@ class ParticipantController {
 
   async update(req, res) {
     const { participantId } = req.params;
-    const { correctAnswers, incorrectAnswers } = req.body;
+    const { correctAnswers, incorrectAnswers, secondsRest } = req.body;
 
     const participantUpdated = await ParticipantsRepository.update({
       participantId,
       correctAnswers,
       incorrectAnswers,
+      secondsRest,
     });
     res.send(participantUpdated);
   }

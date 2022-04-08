@@ -53,9 +53,7 @@ class GameroomsRepository {
       },
       include: {
         participants: {
-          orderBy: {
-            correct_answers: 'desc',
-          },
+          orderBy: [{ correct_answers: 'desc' }, { seconds_rest: 'desc' }],
         },
       },
     });
