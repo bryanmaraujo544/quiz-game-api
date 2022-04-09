@@ -57,7 +57,6 @@ class GameroomsRepository {
         },
       },
     });
-    console.log({ result });
     return result;
   }
 
@@ -119,7 +118,6 @@ class GameroomsRepository {
       }, 1000);
 
       setTimeout(() => {
-        console.log('timeout');
         // Emit to front end that quiz ended and the front grab the results
         socket.broadcast.emit('quiz_ended', { gameroomId: gameroom.id });
         socket.emit('quiz_ended', { gameroomId: gameroom.id });

@@ -87,7 +87,6 @@ class ParticipantsRepository {
         ],
       },
     });
-    console.log('RemoveParticipant', payload);
 
     try {
       const gameroomOfUser = await prisma.gameroom.findFirst({

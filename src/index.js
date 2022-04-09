@@ -27,7 +27,6 @@ function createApplication(httpServer, components, serverOptions = {}) {
   //   createTodoHandlers(components);
 
   io.on('connection', (socket) => {
-    console.log('Connected', socket.id);
     socket.on('join_room', (payload) => {
       socket.join(payload.roomId);
 
@@ -35,12 +34,10 @@ function createApplication(httpServer, components, serverOptions = {}) {
     });
 
     socket.on('rooms_opened', (payload) => {
-      console.log(payload);
       return RoomsRepository.findAll({ payload, socket });
     });
 
     socket.on('participant_left_room', (payload) => {
-      console.log({ payload });
       return ParticipantsRepository.stRemoveParticipant({ payload, socket });
     });
 
