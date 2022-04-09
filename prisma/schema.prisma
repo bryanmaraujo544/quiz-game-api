@@ -1,68 +1,66 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
+  url      = "mysql://b929b3085c6096:d4a1c1ae@us-cdbr-east-05.cleardb.net/heroku_4595935290859d3?reconnect=true"
 }
 
 model Room {
-  id        Int    @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   title     String
-  photo_url String @db.VarChar(512)
-
-  questions Question[]
+  photo_url String     @db.VarChar(512)
   gamerooms Gameroom[]
+  questions Question[]
 
   @@map("rooms")
 }
 
 model Gameroom {
   id           Int           @id @default(autoincrement())
+  room_id      Int
   is_open      Boolean       @default(true)
-  has_started  Boolean       @default(false)
   created_at   DateTime      @default(now())
+  has_started  Boolean       @default(false)
+  room         Room          @relation(fields: [room_id], references: [id])
   participants Participant[]
 
-  room    Room @relation(fields: [room_id], references: [id])
-  room_id Int
-
+  @@index([room_id], map: "gamerooms_room_id_fkey")
   @@map("gamerooms")
 }
 
 model Participant {
   id                Int      @id @default(autoincrement())
   username          String   @db.VarChar(256)
-  gameroom          Gameroom @relation(fields: [gameroom_id], references: [id])
   gameroom_id       Int
   correct_answers   Int      @default(0)
   incorrect_answers Int      @default(0)
   seconds_rest      Int?
+  gameroom          Gameroom @relation(fields: [gameroom_id], references: [id])
 
+  @@index([gameroom_id], map: "participants_gameroom_id_fkey")
   @@map("participants")
 }
 
 model Question {
-  id             Int    @id @default(autoincrement())
-  content        String @db.VarChar(256)
+  id             Int           @id @default(autoincrement())
+  content        String        @db.VarChar(256)
   correct_answer String
-  room           Room   @relation(fields: [room_id], references: [id])
   room_id        Int
+  room           Room          @relation(fields: [room_id], references: [id])
+  alternatives   Alternative[]
 
-  alternatives Alternative[]
-
+  @@index([room_id], map: "questions_room_id_fkey")
   @@map("questions")
 }
 
 model Alternative {
   id          Int      @id @default(autoincrement())
   content     String
-  question    Question @relation(fields: [question_id], references: [id])
   question_id Int
+  question    Question @relation(fields: [question_id], references: [id])
 
+  @@index([question_id], map: "alternatives_question_id_fkey")
   @@map("alternatives")
 }
