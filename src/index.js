@@ -27,6 +27,7 @@ function createApplication(httpServer, components, serverOptions = {}) {
   //   createTodoHandlers(components);
 
   io.on('connection', (socket) => {
+    console.log(`User Connected: ${socket.id}`);
     socket.on('join_room', (payload) => {
       socket.join(payload.roomId);
 

@@ -92,7 +92,7 @@ class GameroomsRepository {
       });
     }
 
-    // If there are 10 participants, start quiz
+    // If there are 5 participants, start quiz
     if (gameroom?.participants?.length === 5) {
       // Set the currect gameroom as has_started
       await prisma.gameroom.update({
@@ -105,7 +105,9 @@ class GameroomsRepository {
         },
       });
 
-      let counter = 30;
+      socket.broadcast.emit('some_gameroom_closed', { data: '' });
+
+      let counter = 60;
       const interval = setInterval(() => {
         if (counter > 0) {
           counter -= 1;
@@ -132,11 +134,11 @@ class GameroomsRepository {
             },
           });
         })();
-      }, 1000 * 30);
+      }, 1000 * 65);
 
       setTimeout(() => {
         clearInterval(interval);
-      }, 1000 * 40);
+      }, 1000 * 70);
     }
   }
 }
