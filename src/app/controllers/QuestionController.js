@@ -18,16 +18,16 @@ class QuestionController {
     if (!content || !correctAnswer || !roomId) {
       res
         .status(400)
-        .json({ message: 'Some fields are missing', questionCreted: null });
+        .json({ message: 'Some fields are missing', questionCreated: null });
     }
 
-    const questionCreted = await QuestionsRepository.create({
+    const questionCreated = await QuestionsRepository.create({
       content,
       correctAnswer,
       roomId,
     });
 
-    res.json({ message: 'Question Created', questionCreted });
+    res.json({ message: 'Question Created', questionCreated });
   }
 }
 
