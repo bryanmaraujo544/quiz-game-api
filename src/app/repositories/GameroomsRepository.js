@@ -107,7 +107,7 @@ class GameroomsRepository {
 
       socket.broadcast.emit('some_gameroom_closed', { data: '' });
 
-      let counter = 60;
+      let counter = 120;
       const interval = setInterval(() => {
         if (counter > 0) {
           counter -= 1;
@@ -134,11 +134,11 @@ class GameroomsRepository {
             },
           });
         })();
-      }, 1000 * 65);
+      }, 1000 * 130);
 
       setTimeout(() => {
         clearInterval(interval);
-      }, 1000 * 70);
+      }, 1000 * 130);
     }
   }
 }
