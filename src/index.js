@@ -23,9 +23,6 @@ const ParticipantsRepository = require('./app/repositories/ParticipantsRepositor
 function createApplication(httpServer, components, serverOptions = {}) {
   const io = new Server(httpServer, serverOptions);
 
-  // const { createTodo, readTodo, updateTodo, deleteTodo, listTodo } =
-  //   createTodoHandlers(components);
-
   io.on('connection', (socket) => {
     console.log(`User Connected: ${socket.id}`);
     socket.on('join_room', (payload) => {
@@ -41,11 +38,6 @@ function createApplication(httpServer, components, serverOptions = {}) {
     socket.on('participant_left_room', (payload) => {
       return ParticipantsRepository.stRemoveParticipant({ payload, socket });
     });
-
-    // socket.on('todo:read', readTodo);
-    // socket.on('todo:update', updateTodo);
-    // socket.on('todo:delete', deleteTodo);
-    // socket.on('todo:list', listTodo);
   });
 
   return io;
